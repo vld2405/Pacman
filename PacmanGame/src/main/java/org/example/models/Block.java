@@ -12,7 +12,7 @@ public abstract class Block {
 
     protected int startX;
     protected int startY;
-    protected char direction = 'U'; // Up Down Left Right
+    protected char direction; // Up Down Left Right
     protected int velocityX = 0;
     protected int velocityY = 0;
 
@@ -56,8 +56,5 @@ public abstract class Block {
         }
     }
 
-    void reset() {
-        this.x = this.startX;
-        this.y = this.startY;
-    }
+    abstract void reset();
 }

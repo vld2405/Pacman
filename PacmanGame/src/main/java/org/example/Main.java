@@ -5,7 +5,6 @@ import org.example.models.Game;
 import javax.swing.JFrame;
 import java.io.IOException;
 
-// TODO: fa sa poti sa schimbi directia fara sa spamezi ca cretinu
 // TODO: sa adaug powerup ca sa poti sa mananci fantome si EVENTUAL sa adaug si respawn pentru fantome (cu shortest path ca sa se intoarca la baza)
 // TODO: sa adaug mai multe harti
 // TODO: sa adaug animatii pentru fantome si pentru pacman

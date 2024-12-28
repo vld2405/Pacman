@@ -14,5 +14,6 @@ public class Food extends Block{
 
     @Override
     public void updateDirection(char direction, HashSet<Block> walls, int tileSize) {}
-
+    @Override
+    void reset() {}
 }

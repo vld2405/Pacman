@@ -12,8 +12,6 @@ public class Ghost extends Block{
 
     @Override
     public void updateDirection(char direction, HashSet<Block> walls, int tileSize) {
-        //if(this.direction == direction) return;    // - ASTA DOAR PENTRU PACMAN NU SI PENTRU FANTOMITE
-
         char prevDirection = this.direction;
         this.direction = direction;
 
@@ -34,5 +32,11 @@ public class Ghost extends Block{
                 updateVelocity(tileSize);
             }
         }
+    }
+
+    @Override
+    void reset() {
+        this.x = this.startX;
+        this.y = this.startY;
     }
 }

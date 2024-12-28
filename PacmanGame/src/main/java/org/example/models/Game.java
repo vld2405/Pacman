@@ -18,12 +18,12 @@ import java.util.Iterator;
 import java.util.Random;
 
 public class Game extends JPanel implements ActionListener, KeyListener {
-
+    static int boardWidth;
+    static int boardHeight;
     private int rowCount;
     private int columnCount;
     public int tileSize = 32;
-    private int boardWidth;
-    private int boardHeight;
+
     private int mapIndex;
     private int mapCount;
 
@@ -40,15 +40,12 @@ public class Game extends JPanel implements ActionListener, KeyListener {
     private final Image pinkGhostImage;
     private final Image redGhostImage;
 
-    private final Image pacmanUpImage;
-    private final Image pacmanDownImage;
-    private final Image pacmanLeftImage;
-    private final Image pacmanRightImage;
+    private final Image[] pacmanImages; // 0 - UP, 1 - DOWN, 2- LEFT, 3 - RIGHT
 
     private HashSet<Block> walls;
     private HashSet<Block> foods;
     private HashSet<Block> ghosts;
-    private Block pacman;
+    private Pacman pacman;
 
     private Timer gameLoop;
     private char[] directions = {'U', 'D', 'L', 'R'};
@@ -108,10 +105,10 @@ public class Game extends JPanel implements ActionListener, KeyListener {
         pinkGhostImage = new ImageIcon(getClass().getResource("/images/pinkGhost.png")).getImage();
         redGhostImage = new ImageIcon(getClass().getResource("/images/redGhost.png")).getImage();
 
-        pacmanUpImage = new ImageIcon(getClass().getResource("/images/pacmanUp.png")).getImage();
-        pacmanDownImage = new ImageIcon(getClass().getResource("/images/pacmanDown.png")).getImage();
-        pacmanLeftImage = new ImageIcon(getClass().getResource("/images/pacmanLeft.png")).getImage();
-        pacmanRightImage = new ImageIcon(getClass().getResource("/images/pacmanRight.png")).getImage();
+        pacmanImages = new Image[]{new ImageIcon(getClass().getResource("/images/pacmanUp.png")).getImage(),
+                new ImageIcon(getClass().getResource("/images/pacmanDown.png")).getImage(),
+                new ImageIcon(getClass().getResource("/images/pacmanLeft.png")).getImage(),
+                new ImageIcon(getClass().getResource("/images/pacmanRight.png")).getImage()};
 
         noWallsRows = new ArrayList<Integer>();
         noWallsColumns = new ArrayList<Integer>();
@@ -203,7 +200,7 @@ public class Game extends JPanel implements ActionListener, KeyListener {
                         ghosts.add(new Ghost(redGhostImage, x, y, tileSize, tileSize));
                         break;
                     case 'P':
-                        pacman = new PacMan(pacmanRightImage, x, y, tileSize, tileSize);
+                        pacman = new Pacman(pacmanImages, x, y, tileSize, tileSize);
                         break;
                     case ' ':
                         foods.add(new Food(null, x + 14, y + 14, 4, 4));
@@ -261,6 +258,8 @@ public class Game extends JPanel implements ActionListener, KeyListener {
     }
 
     public void move() {
+        pacman.tryChangeDirection(walls, tileSize);
+
         pacman.x += pacman.velocityX;
         pacman.y += pacman.velocityY;
 
@@ -342,11 +341,10 @@ public class Game extends JPanel implements ActionListener, KeyListener {
     public void keyTyped(KeyEvent e) {}
 
     @Override
-    public void keyPressed(KeyEvent e) {
-        //keyReleased(e);
-    }
+    public void keyPressed(KeyEvent e) {}
 
     @Override
+
     public void keyReleased(KeyEvent e) {
         if(gameOver) {
             if(e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -361,32 +359,23 @@ public class Game extends JPanel implements ActionListener, KeyListener {
         }
 
         if(e.getKeyCode() == KeyEvent.VK_W || e.getKeyCode() == KeyEvent.VK_UP) {
+            pacman.setDesiredDirection('U');
             pacman.updateDirection('U', walls, tileSize);
         }
 
         if(e.getKeyCode() == KeyEvent.VK_S || e.getKeyCode() == KeyEvent.VK_DOWN) {
+            pacman.setDesiredDirection('D');
             pacman.updateDirection('D', walls, tileSize);
         }
 
         if(e.getKeyCode() == KeyEvent.VK_A || e.getKeyCode() == KeyEvent.VK_LEFT) {
+            pacman.setDesiredDirection('L');
             pacman.updateDirection('L', walls, tileSize);
         }
 
         if(e.getKeyCode() == KeyEvent.VK_D || e.getKeyCode() == KeyEvent.VK_RIGHT) {
+            pacman.setDesiredDirection('R');
             pacman.updateDirection('R', walls, tileSize);
-        }
-
-        if(pacman.direction == 'U') {
-            pacman.image = pacmanUpImage;
-        }
-        else if(pacman.direction == 'D') {
-            pacman.image = pacmanDownImage;
-        }
-        else if(pacman.direction == 'L') {
-            pacman.image = pacmanLeftImage;
-        }
-        else if(pacman.direction == 'R') {
-            pacman.image = pacmanRightImage;
         }
     }
 

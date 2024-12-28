@@ -12,4 +12,6 @@ public class Wall extends Block{
 
     @Override
     public void updateDirection(char direction, HashSet<Block> walls, int tileSize) {}
+    @Override
+    void reset() {}
 }
