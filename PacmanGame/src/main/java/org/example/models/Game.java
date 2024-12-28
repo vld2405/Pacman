@@ -39,6 +39,10 @@ public class Game extends JPanel implements ActionListener, KeyListener {
     private final Image orangeGhostImage;
     private final Image pinkGhostImage;
     private final Image redGhostImage;
+    private final Image scaredGhostImage;
+
+    private final Image powerFoodImage;
+    private final Image cherryImage;
 
     private final Image[] pacmanImages; // 0 - UP, 1 - DOWN, 2- LEFT, 3 - RIGHT
 
@@ -100,10 +104,15 @@ public class Game extends JPanel implements ActionListener, KeyListener {
         //load images
         wallImage = new ImageIcon(getClass().getResource("/images/wall.png")).getImage();
 
+        powerFoodImage = new ImageIcon(getClass().getResource("/images/powerFood.png")).getImage();
+        cherryImage = new ImageIcon(getClass().getResource("/images/cherry.png")).getImage();
+
         blueGhostImage = new ImageIcon(getClass().getResource("/images/blueGhost.png")).getImage();
         orangeGhostImage = new ImageIcon(getClass().getResource("/images/orangeGhost.png")).getImage();
         pinkGhostImage = new ImageIcon(getClass().getResource("/images/pinkGhost.png")).getImage();
         redGhostImage = new ImageIcon(getClass().getResource("/images/redGhost.png")).getImage();
+
+        scaredGhostImage = new ImageIcon(getClass().getResource("/images/scaredGhost.png")).getImage();
 
         pacmanImages = new Image[]{new ImageIcon(getClass().getResource("/images/pacmanUp.png")).getImage(),
                 new ImageIcon(getClass().getResource("/images/pacmanDown.png")).getImage(),
@@ -203,7 +212,13 @@ public class Game extends JPanel implements ActionListener, KeyListener {
                         pacman = new Pacman(pacmanImages, x, y, tileSize, tileSize);
                         break;
                     case ' ':
-                        foods.add(new Food(null, x + 14, y + 14, 4, 4));
+                        foods.add(new Food(null, x + 14, y + 14, 4, 4, 10));
+                        break;
+                    case 'C':
+                        foods.add(new Food(cherryImage, x, y , tileSize, tileSize, 100));
+                        break;
+                    case 'F':
+                        foods.add(new Food(powerFoodImage, x + 8, y + 8, 16, 16, 0));
                         break;
                 }
             }
@@ -229,7 +244,12 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 
         g.setColor(Color.WHITE);
         for(Block food: foods) {
-            g.fillRect(food.x, food.y, food.width, food.height);
+            if(food.image != null) {
+                g.drawImage(food.image, food.x, food.y, food.width, food.height, null);
+            }
+            else {
+                g.fillRect(food.x, food.y, food.width, food.height);
+            }
         }
 
         g.setFont(new Font("Arial", Font.BOLD, 20));
@@ -322,7 +342,8 @@ public class Game extends JPanel implements ActionListener, KeyListener {
         while (iterator.hasNext()) {
             Block food = iterator.next();
             if (Block.collision(pacman, food)) {
-                score += Food.foodScore;
+                Food foodItem = (Food) food;
+                score += foodItem.foodScore;
                 iterator.remove();
             }
         }
