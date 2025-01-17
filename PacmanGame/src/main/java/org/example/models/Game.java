@@ -60,6 +60,62 @@ public class Game extends JPanel implements ActionListener, KeyListener {
     /// X = wall, O = skip, P = pacman, ' ' = food
     /// Ghosts: b = blue, o = orange, p = pink, r = red
 
+    public Game() throws IOException {
+        readFromJson();
+
+        setPreferredSize(new Dimension(boardWidth, boardHeight));
+        setBackground(Color.BLACK);
+        addKeyListener(this);
+        setFocusable(true);
+
+        mapIndex = random.nextInt(tileMaps.length);
+
+        //load images
+        wallImage = new ImageIcon(getClass().getResource("/images/wall.png")).getImage();
+        powerFoodImage = new ImageIcon(getClass().getResource("/images/powerFood.png")).getImage();
+        cherryImage = new ImageIcon(getClass().getResource("/images/cherry.png")).getImage();
+
+        blueGhostImage = new ImageIcon(getClass().getResource("/images/blueGhost.png")).getImage();
+        orangeGhostImage = new ImageIcon(getClass().getResource("/images/orangeGhost.png")).getImage();
+        pinkGhostImage = new ImageIcon(getClass().getResource("/images/pinkGhost.png")).getImage();
+        redGhostImage = new ImageIcon(getClass().getResource("/images/redGhost.png")).getImage();
+
+        scaredGhostImage = new ImageIcon(getClass().getResource("/images/scaredGhost.png")).getImage();
+
+        pacmanImages = new Image[]{new ImageIcon(getClass().getResource("/images/pacmanUp.png")).getImage(),
+                new ImageIcon(getClass().getResource("/images/pacmanDown.png")).getImage(),
+                new ImageIcon(getClass().getResource("/images/pacmanLeft.png")).getImage(),
+                new ImageIcon(getClass().getResource("/images/pacmanRight.png")).getImage()};
+
+        noWallsRows = new ArrayList<Integer>();
+        noWallsColumns = new ArrayList<Integer>();
+
+        loadMap();
+        findNoWallsRows();
+        findNoWallsColumns();
+
+        System.out.print("no wall rows: ");
+        for(int index: noWallsRows){
+            System.out.print(index + " ");
+        }
+        System.out.print("\nno wall columns: ");
+        for(int index: noWallsColumns){
+            System.out.print(index + " ");
+        }
+        System.out.println();
+
+        for(Block ghost: ghosts)
+        {
+            char newDirection = directions[random.nextInt(4)];
+            System.out.println("Ghost dir: " + newDirection);
+            ghost.updateDirection(newDirection, walls, tileSize);
+        }
+
+        // how long it takes to start timer, milliseconds gone between frames
+        gameLoop = new Timer(50, this); // 20fps (1000/50)
+        gameLoop.start();
+    }
+
     private void readFromJson() throws IOException {
         try {
             String data = new String(Files.readAllBytes(Paths.get("./map.json")));
@@ -91,63 +147,6 @@ public class Game extends JPanel implements ActionListener, KeyListener {
         }
     }
 
-    public Game() throws IOException {
-        readFromJson();
-
-        setPreferredSize(new Dimension(boardWidth, boardHeight));
-        setBackground(Color.BLACK);
-        addKeyListener(this);
-        setFocusable(true);
-
-        mapIndex = random.nextInt(tileMaps.length);
-
-        //load images
-        wallImage = new ImageIcon(getClass().getResource("/images/wall.png")).getImage();
-
-        powerFoodImage = new ImageIcon(getClass().getResource("/images/powerFood.png")).getImage();
-        cherryImage = new ImageIcon(getClass().getResource("/images/cherry.png")).getImage();
-
-        blueGhostImage = new ImageIcon(getClass().getResource("/images/blueGhost.png")).getImage();
-        orangeGhostImage = new ImageIcon(getClass().getResource("/images/orangeGhost.png")).getImage();
-        pinkGhostImage = new ImageIcon(getClass().getResource("/images/pinkGhost.png")).getImage();
-        redGhostImage = new ImageIcon(getClass().getResource("/images/redGhost.png")).getImage();
-
-        scaredGhostImage = new ImageIcon(getClass().getResource("/images/scaredGhost.png")).getImage();
-
-        pacmanImages = new Image[]{new ImageIcon(getClass().getResource("/images/pacmanUp.png")).getImage(),
-                new ImageIcon(getClass().getResource("/images/pacmanDown.png")).getImage(),
-                new ImageIcon(getClass().getResource("/images/pacmanLeft.png")).getImage(),
-                new ImageIcon(getClass().getResource("/images/pacmanRight.png")).getImage()};
-
-        noWallsRows = new ArrayList<Integer>();
-        noWallsColumns = new ArrayList<Integer>();
-
-        loadMap();
-        findNoWallsRows();
-        findNoWallsColumns();
-
-        System.out.print("no wall rows: ");
-        for(int index: noWallsRows){
-            System.out.print(index + " ");
-        }
-        System.out.print("\nno wall columns: ");
-        for(int index: noWallsColumns){
-            System.out.print(index + " ");
-        }
-        System.out.println("");
-
-        for(Block ghost: ghosts)
-        {
-            char newDirection = directions[random.nextInt(4)];
-            System.out.println("Ghost dir: " + newDirection);
-            ghost.updateDirection(newDirection, walls, tileSize);
-        }
-
-        // how long it takes to start timer, milliseconds gone between frames
-        gameLoop = new Timer(50, this); // 20fps (1000/50)
-        gameLoop.start();
-    }
-
     private void findNoWallsRows() {
         for(int i=0; i < rowCount; ++i) {
             boolean found = true;
@@ -177,7 +176,6 @@ public class Game extends JPanel implements ActionListener, KeyListener {
                 noWallsColumns.add(i);
         }
     }
-
 
     private void loadMap() {
         walls = new HashSet<Block>();
@@ -211,7 +209,7 @@ public class Game extends JPanel implements ActionListener, KeyListener {
                     case 'P':
                         pacman = new Pacman(pacmanImages, x, y, tileSize, tileSize);
                         break;
-                    case ' ':
+                    case 'z':
                         foods.add(new Food(null, x + 14, y + 14, 4, 4, 10));
                         break;
                     case 'C':
@@ -290,6 +288,7 @@ public class Game extends JPanel implements ActionListener, KeyListener {
             mapIndex++;
             mapIndex %= mapCount;
             loadMap();
+            resetPositions();
         }
 
         changePosIfOutOfFrame(pacman);
