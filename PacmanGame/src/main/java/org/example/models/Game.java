@@ -57,6 +57,11 @@ public class Game extends JPanel implements ActionListener, KeyListener {
     private char[] directions = {'U', 'D', 'L', 'R'};
     private Random random = new Random();
 
+    private Timer powerFoodTimer;
+    private Timer cherryTimer;
+
+    boolean isCherryTimerStarted;
+
     private String[][] tileMaps;
 
     /// X = wall, O = skip, P = pacman, ' ' = food
@@ -200,6 +205,7 @@ public class Game extends JPanel implements ActionListener, KeyListener {
         noWallsColumns.clear();
         noWallsRows.clear();
 
+        isCherryTimerStarted = false;
         foodsEaten = 0;
 
         for(int row = 0; row < rowCount; ++row) {
@@ -265,17 +271,33 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 
         g.setColor(Color.WHITE);
         for(Block food: foods) {
-            if(food instanceof Cherry)
+            if(food instanceof PowerFood)
             {
-                if(foodsEaten >= 20) {
-                    g.drawImage(food.image, food.x, food.y, food.width, food.height, null);
-                }
+
             }
             else {
-                if (food.image != null) {
-                    g.drawImage(food.image, food.x, food.y, food.width, food.height, null);
+                if (food instanceof Cherry) {
+                    if (foodsEaten >= 20) {
+                        if(!isCherryTimerStarted)
+                        {
+                            cherryTimer = new Timer(10000, new ActionListener() {
+                                public void actionPerformed(ActionEvent e) {
+                                    foods.remove(food);
+                                    cherryTimer.stop();
+                                    repaint();
+                                }
+                            });
+                            cherryTimer.start();
+                            isCherryTimerStarted = true;
+                        }
+                        g.drawImage(food.image, food.x, food.y, food.width, food.height, null);
+                    }
                 } else {
-                    g.fillRect(food.x, food.y, food.width, food.height);
+                    if (food.image != null) {
+                        g.drawImage(food.image, food.x, food.y, food.width, food.height, null);
+                    } else {
+                        g.fillRect(food.x, food.y, food.width, food.height);
+                    }
                 }
             }
         }
@@ -303,6 +325,10 @@ public class Game extends JPanel implements ActionListener, KeyListener {
         if(block.y + block.width < 0) {
             block.y = boardHeight;
         }
+    }
+
+    public boolean stillInFrame(Block block) {
+        return block.x < boardWidth && block.x + block.width > 0 && block.y < boardHeight && block.y + block.height > 0;
     }
 
     public void move() {
@@ -343,13 +369,15 @@ public class Game extends JPanel implements ActionListener, KeyListener {
                 resetPositions();
             }
 
-            if (noWallsColumns.contains(ghost.x / tileSize) && ghost.direction != 'L' && ghost.direction != 'R') {
-                char newDirection = directions[random.nextInt(2) + 2];
-                ghost.updateDirection(newDirection, walls, tileSize);
-            }
-            else if (noWallsRows.contains(ghost.y / tileSize) && ghost.direction != 'U' && ghost.direction != 'D') {
-                char newDirection = directions[random.nextInt(2)];
-                ghost.updateDirection(newDirection, walls, tileSize);
+            if(stillInFrame(ghost))
+            {
+                if (noWallsColumns.contains(ghost.x / tileSize) && ghost.direction != 'L' && ghost.direction != 'R') {
+                    char newDirection = directions[random.nextInt(2) + 2];
+                    ghost.updateDirection(newDirection, walls, tileSize);
+                } else if (noWallsRows.contains(ghost.y / tileSize) && ghost.direction != 'U' && ghost.direction != 'D') {
+                    char newDirection = directions[random.nextInt(2)];
+                    ghost.updateDirection(newDirection, walls, tileSize);
+                }
             }
 
             ghost.x += ghost.velocityX;
