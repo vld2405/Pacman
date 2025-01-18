@@ -6,6 +6,7 @@ import java.util.HashSet;
 public class Pacman extends Block{
     private char desiredDirection;
     Image[] pacmanImages;
+    private int animationFrame = 0;
 
     public Pacman(){}
 
@@ -49,19 +50,24 @@ public class Pacman extends Block{
         updateImage();
     }
 
+    public void updateAnimation() {
+        animationFrame = (animationFrame + 1) % 2;
+        updateImage();
+    }
+
     private void updateImage() {
         switch (this.direction) {
             case 'U':
-                this.image = pacmanImages[0];
+                this.image = pacmanImages[animationFrame == 0 ? 0 : 4];
                 break;
             case 'D':
-                this.image = pacmanImages[1];
+                this.image = pacmanImages[animationFrame == 0 ? 1 : 4];
                 break;
             case 'L':
-                this.image = pacmanImages[2];
+                this.image = pacmanImages[animationFrame == 0 ? 2 : 4];
                 break;
             case 'R':
-                this.image = pacmanImages[3];
+                this.image = pacmanImages[animationFrame == 0 ? 3 : 4];
                 break;
         }
     }

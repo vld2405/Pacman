@@ -85,7 +85,9 @@ public class Game extends JPanel implements ActionListener, KeyListener {
         pacmanImages = new Image[]{new ImageIcon(getClass().getResource("/images/pacmanUp.png")).getImage(),
                 new ImageIcon(getClass().getResource("/images/pacmanDown.png")).getImage(),
                 new ImageIcon(getClass().getResource("/images/pacmanLeft.png")).getImage(),
-                new ImageIcon(getClass().getResource("/images/pacmanRight.png")).getImage()};
+                new ImageIcon(getClass().getResource("/images/pacmanRight.png")).getImage(),
+                new ImageIcon(getClass().getResource("/images/pacmanClosed.png")).getImage()
+        };
 
         noWallsRows = new ArrayList<Integer>();
         noWallsColumns = new ArrayList<Integer>();
@@ -277,6 +279,8 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 
     public void move() {
         pacman.tryChangeDirection(walls, tileSize);
+
+        pacman.updateAnimation();
 
         pacman.x += pacman.velocityX;
         pacman.y += pacman.velocityY;
