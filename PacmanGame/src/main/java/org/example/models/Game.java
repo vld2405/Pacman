@@ -35,10 +35,10 @@ public class Game extends JPanel implements ActionListener, KeyListener {
     ArrayList<Integer> noWallsColumns;
 
     private final Image wallImage;
-    private final Image blueGhostImage;
-    private final Image orangeGhostImage;
-    private final Image pinkGhostImage;
-    private final Image redGhostImage;
+    private final Image[] blueGhostImages;
+    private final Image[] orangeGhostImages;
+    private final Image[] pinkGhostImages;
+    private final Image[] redGhostImages;
     private final Image scaredGhostImage;
 
     private final Image powerFoodImage;
@@ -75,41 +75,52 @@ public class Game extends JPanel implements ActionListener, KeyListener {
         powerFoodImage = new ImageIcon(getClass().getResource("/images/powerFood.png")).getImage();
         cherryImage = new ImageIcon(getClass().getResource("/images/cherry.png")).getImage();
 
-        blueGhostImage = new ImageIcon(getClass().getResource("/images/blueGhost.png")).getImage();
-        orangeGhostImage = new ImageIcon(getClass().getResource("/images/orangeGhost.png")).getImage();
-        pinkGhostImage = new ImageIcon(getClass().getResource("/images/pinkGhost.png")).getImage();
-        redGhostImage = new ImageIcon(getClass().getResource("/images/redGhost.png")).getImage();
+        blueGhostImages = new Image[] {
+                new ImageIcon(getClass().getResource("/images/BlueGhostImages/blueGhostUp.png")).getImage(),
+                new ImageIcon(getClass().getResource("/images/BlueGhostImages/blueGhostDown.png")).getImage(),
+                new ImageIcon(getClass().getResource("/images/BlueGhostImages/blueGhostLeft.png")).getImage(),
+                new ImageIcon(getClass().getResource("/images/BlueGhostImages/blueGhostRight.png")).getImage()
+        };
+
+        orangeGhostImages = new Image[] {
+                new ImageIcon(getClass().getResource("/images/OrangeGhostImages/orangeGhostUp.png")).getImage(),
+                new ImageIcon(getClass().getResource("/images/OrangeGhostImages/orangeGhostDown.png")).getImage(),
+                new ImageIcon(getClass().getResource("/images/OrangeGhostImages/orangeGhostLeft.png")).getImage(),
+                new ImageIcon(getClass().getResource("/images/OrangeGhostImages/orangeGhostRight.png")).getImage()
+        };
+
+        pinkGhostImages = new Image[] {
+                new ImageIcon(getClass().getResource("/images/PinkGhostImages/pinkGhostUp.png")).getImage(),
+                new ImageIcon(getClass().getResource("/images/PinkGhostImages/pinkGhostDown.png")).getImage(),
+                new ImageIcon(getClass().getResource("/images/PinkGhostImages/pinkGhostLeft.png")).getImage(),
+                new ImageIcon(getClass().getResource("/images/PinkGhostImages/pinkGhostRight.png")).getImage()
+        };
+
+        redGhostImages = new Image[] {
+                new ImageIcon(getClass().getResource("/images/RedGhostImages/redGhostUp.png")).getImage(),
+                new ImageIcon(getClass().getResource("/images/RedGhostImages/redGhostDown.png")).getImage(),
+                new ImageIcon(getClass().getResource("/images/RedGhostImages/redGhostLeft.png")).getImage(),
+                new ImageIcon(getClass().getResource("/images/RedGhostImages/redGhostRight.png")).getImage()
+        };
 
         scaredGhostImage = new ImageIcon(getClass().getResource("/images/scaredGhost.png")).getImage();
 
-        pacmanImages = new Image[]{new ImageIcon(getClass().getResource("/images/pacmanUp.png")).getImage(),
-                new ImageIcon(getClass().getResource("/images/pacmanDown.png")).getImage(),
-                new ImageIcon(getClass().getResource("/images/pacmanLeft.png")).getImage(),
-                new ImageIcon(getClass().getResource("/images/pacmanRight.png")).getImage(),
-                new ImageIcon(getClass().getResource("/images/pacmanClosed.png")).getImage()
+        pacmanImages = new Image[] {
+                new ImageIcon(getClass().getResource("/images/PacmanImages/pacmanUp.png")).getImage(),
+                new ImageIcon(getClass().getResource("/images/PacmanImages/pacmanDown.png")).getImage(),
+                new ImageIcon(getClass().getResource("/images/PacmanImages/pacmanLeft.png")).getImage(),
+                new ImageIcon(getClass().getResource("/images/PacmanImages/pacmanRight.png")).getImage(),
+                new ImageIcon(getClass().getResource("/images/PacmanImages/pacmanClosed.png")).getImage()
         };
 
         noWallsRows = new ArrayList<Integer>();
         noWallsColumns = new ArrayList<Integer>();
 
         loadMap();
-        findNoWallsRows();
-        findNoWallsColumns();
-
-        System.out.print("no wall rows: ");
-        for(int index: noWallsRows){
-            System.out.print(index + " ");
-        }
-        System.out.print("\nno wall columns: ");
-        for(int index: noWallsColumns){
-            System.out.print(index + " ");
-        }
-        System.out.println();
 
         for(Block ghost: ghosts)
         {
             char newDirection = directions[random.nextInt(4)];
-            System.out.println("Ghost dir: " + newDirection);
             ghost.updateDirection(newDirection, walls, tileSize);
         }
 
@@ -184,6 +195,9 @@ public class Game extends JPanel implements ActionListener, KeyListener {
         foods = new HashSet<Block>();
         ghosts = new HashSet<Block>();
 
+        noWallsColumns.clear();
+        noWallsRows.clear();
+
         for(int row = 0; row < rowCount; ++row) {
             for(int col = 0; col < columnCount; ++col) {
                 String rowString = tileMaps[mapIndex][row];
@@ -197,21 +211,21 @@ public class Game extends JPanel implements ActionListener, KeyListener {
                         walls.add(new Wall(wallImage, x, y, tileSize, tileSize));
                         break;
                     case 'b':
-                        ghosts.add(new Ghost(blueGhostImage, x, y, tileSize, tileSize));
+                        ghosts.add(new Ghost(blueGhostImages, x, y, tileSize, tileSize));
                         break;
                     case 'o':
-                        ghosts.add(new Ghost(orangeGhostImage, x, y, tileSize, tileSize));
+                        ghosts.add(new Ghost(orangeGhostImages, x, y, tileSize, tileSize));
                         break;
                     case 'p':
-                        ghosts.add(new Ghost(pinkGhostImage, x, y, tileSize, tileSize));
+                        ghosts.add(new Ghost(pinkGhostImages, x, y, tileSize, tileSize));
                         break;
                     case 'r':
-                        ghosts.add(new Ghost(redGhostImage, x, y, tileSize, tileSize));
+                        ghosts.add(new Ghost(redGhostImages, x, y, tileSize, tileSize));
                         break;
                     case 'P':
                         pacman = new Pacman(pacmanImages, x, y, tileSize, tileSize);
                         break;
-                    case 'z':
+                    case ' ':
                         foods.add(new Food(null, x + 14, y + 14, 4, 4, 10));
                         break;
                     case 'C':
@@ -223,6 +237,9 @@ public class Game extends JPanel implements ActionListener, KeyListener {
                 }
             }
         }
+
+        findNoWallsRows();
+        findNoWallsColumns();
     }
 
     public void paintComponent(Graphics g) {

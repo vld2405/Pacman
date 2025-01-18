@@ -4,10 +4,12 @@ import java.awt.*;
 import java.util.HashSet;
 
 public class Ghost extends Block{
+    private Image[] ghostImages;
 
     public Ghost() {};
-    public Ghost(Image image, int x, int y, int width, int height){
-        super(image, x, y, width, height);
+    public Ghost(Image[] images, int x, int y, int width, int height){
+        super(images[0], x, y, width, height);
+        this.ghostImages = images;
     }
 
     @Override
@@ -16,6 +18,7 @@ public class Ghost extends Block{
         this.direction = direction;
 
         updateVelocity(tileSize);
+        updateOrientation(direction);
 
         this.x += this.velocityX;
         this.y += this.velocityY;
@@ -31,6 +34,24 @@ public class Ghost extends Block{
 
                 updateVelocity(tileSize);
             }
+        }
+    }
+
+    public void updateOrientation(char direction) {
+        switch(direction)
+        {
+            case 'U':
+                image = ghostImages[0];
+                break;
+            case 'D':
+                image = ghostImages[1];
+                break;
+            case 'L':
+                image = ghostImages[2];
+                break;
+            case 'R':
+                image = ghostImages[3];
+                break;
         }
     }
 
