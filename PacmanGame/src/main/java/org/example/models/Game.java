@@ -29,6 +29,8 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 
     private int score = 0;
     private int remainingLives = 3;
+    private int foodsEaten = 0;
+
     private boolean gameOver = false;
 
     ArrayList<Integer> noWallsRows;
@@ -198,6 +200,8 @@ public class Game extends JPanel implements ActionListener, KeyListener {
         noWallsColumns.clear();
         noWallsRows.clear();
 
+        foodsEaten = 0;
+
         for(int row = 0; row < rowCount; ++row) {
             for(int col = 0; col < columnCount; ++col) {
                 String rowString = tileMaps[mapIndex][row];
@@ -229,7 +233,7 @@ public class Game extends JPanel implements ActionListener, KeyListener {
                         foods.add(new Food(null, x + 14, y + 14, 4, 4, 10));
                         break;
                     case 'C':
-                        foods.add(new Food(cherryImage, x, y , tileSize, tileSize, 100));
+                        foods.add(new Cherry(cherryImage, x, y , tileSize, tileSize, 100));
                         break;
                     case 'F':
                         foods.add(new Food(powerFoodImage, x + 8, y + 8, 16, 16, 0));
@@ -261,11 +265,18 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 
         g.setColor(Color.WHITE);
         for(Block food: foods) {
-            if(food.image != null) {
-                g.drawImage(food.image, food.x, food.y, food.width, food.height, null);
+            if(food instanceof Cherry)
+            {
+                if(foodsEaten >= 20) {
+                    g.drawImage(food.image, food.x, food.y, food.width, food.height, null);
+                }
             }
             else {
-                g.fillRect(food.x, food.y, food.width, food.height);
+                if (food.image != null) {
+                    g.drawImage(food.image, food.x, food.y, food.width, food.height, null);
+                } else {
+                    g.fillRect(food.x, food.y, food.width, food.height);
+                }
             }
         }
 
@@ -363,8 +374,17 @@ public class Game extends JPanel implements ActionListener, KeyListener {
             Block food = iterator.next();
             if (Block.collision(pacman, food)) {
                 Food foodItem = (Food) food;
-                score += foodItem.foodScore;
-                iterator.remove();
+                if(food instanceof Cherry) {
+                    if(foodsEaten >= 20) {
+                        score += foodItem.foodScore;
+                        iterator.remove();
+                    }
+                }
+                else {
+                    score += foodItem.foodScore;
+                    foodsEaten++;
+                    iterator.remove();
+                }
             }
         }
     }
