@@ -5,11 +5,25 @@ import java.util.HashSet;
 
 public class Ghost extends Block{
     private Image[] ghostImages;
+    private boolean isScared = false; // New flag to track if the ghost is scared
 
     public Ghost() {};
     public Ghost(Image[] images, int x, int y, int width, int height){
         super(images[0], x, y, width, height);
         this.ghostImages = images;
+    }
+
+    public void setScaredStatus(boolean scared) {
+        this.isScared = scared;
+        if (scared) {
+            this.image = Game.scaredGhostImage; // Set scared image
+        } else {
+            updateOrientation(this.direction); // Reset to normal based on direction
+        }
+    }
+
+    public boolean getScaredStatus() {
+        return this.isScared;
     }
 
     @Override
@@ -18,15 +32,16 @@ public class Ghost extends Block{
         this.direction = direction;
 
         updateVelocity(tileSize);
-        updateOrientation(direction);
+
+        if (!isScared) { // Only update orientation if not scared
+            updateOrientation(direction);
+        }
 
         this.x += this.velocityX;
         this.y += this.velocityY;
 
-        for(Block wall: walls)
-        {
-            if(collision(this, wall))
-            {
+        for (Block wall : walls) {
+            if (collision(this, wall)) {
                 this.x -= this.velocityX;
                 this.y -= this.velocityY;
 
@@ -59,5 +74,6 @@ public class Ghost extends Block{
     void reset() {
         this.x = this.startX;
         this.y = this.startY;
+        this.isScared = false; // Reset scared state
     }
 }

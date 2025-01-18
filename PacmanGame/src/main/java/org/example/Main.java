@@ -5,10 +5,6 @@ import org.example.models.Game;
 import javax.swing.JFrame;
 import java.io.IOException;
 
-// TODO: sa adaug powerup ca sa poti sa mananci fantome si EVENTUAL sa adaug si respawn pentru fantome (cu shortest path ca sa se intoarca la baza)
-
-// TODO: logica pt PowerFood si pentru Cherry
-
 public class Main {
     public static void main(String[] args) throws IOException {
         int rowCount = 21;

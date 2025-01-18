@@ -41,7 +41,7 @@ public class Game extends JPanel implements ActionListener, KeyListener {
     private final Image[] orangeGhostImages;
     private final Image[] pinkGhostImages;
     private final Image[] redGhostImages;
-    private final Image scaredGhostImage;
+    static Image scaredGhostImage;
 
     private final Image powerFoodImage;
     private final Image cherryImage;
@@ -61,6 +61,7 @@ public class Game extends JPanel implements ActionListener, KeyListener {
     private Timer cherryTimer;
 
     boolean isCherryTimerStarted;
+    boolean powerFoodEaten;
 
     private String[][] tileMaps;
 
@@ -206,6 +207,8 @@ public class Game extends JPanel implements ActionListener, KeyListener {
         noWallsRows.clear();
 
         isCherryTimerStarted = false;
+        powerFoodEaten = false;
+
         foodsEaten = 0;
 
         for(int row = 0; row < rowCount; ++row) {
@@ -242,7 +245,7 @@ public class Game extends JPanel implements ActionListener, KeyListener {
                         foods.add(new Cherry(cherryImage, x, y , tileSize, tileSize, 100));
                         break;
                     case 'F':
-                        foods.add(new Food(powerFoodImage, x + 8, y + 8, 16, 16, 0));
+                        foods.add(new PowerFood(powerFoodImage, x + 8, y + 8, 16, 16, 0));
                         break;
                 }
             }
@@ -271,35 +274,28 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 
         g.setColor(Color.WHITE);
         for(Block food: foods) {
-            if(food instanceof PowerFood)
-            {
-
-            }
-            else {
-                if (food instanceof Cherry) {
-                    if (foodsEaten >= 20) {
-                        if(!isCherryTimerStarted)
-                        {
-                            cherryTimer = new Timer(10000, new ActionListener() {
-                                public void actionPerformed(ActionEvent e) {
-                                    foods.remove(food);
-                                    cherryTimer.stop();
-                                    repaint();
-                                }
-                            });
-                            cherryTimer.start();
-                            isCherryTimerStarted = true;
-                        }
-                        g.drawImage(food.image, food.x, food.y, food.width, food.height, null);
+            if (food instanceof Cherry) {
+                if (foodsEaten >= 20) {
+                    if(!isCherryTimerStarted)
+                    {
+                        cherryTimer = new Timer(10000, e -> {
+                            foods.remove(food);
+                            cherryTimer.stop();
+                            repaint();
+                        });
+                        cherryTimer.start();
+                        isCherryTimerStarted = true;
                     }
+                    g.drawImage(food.image, food.x, food.y, food.width, food.height, null);
+                }
+            } else {
+                if (food.image != null) {
+                    g.drawImage(food.image, food.x, food.y, food.width, food.height, null);
                 } else {
-                    if (food.image != null) {
-                        g.drawImage(food.image, food.x, food.y, food.width, food.height, null);
-                    } else {
-                        g.fillRect(food.x, food.y, food.width, food.height);
-                    }
+                    g.fillRect(food.x, food.y, food.width, food.height);
                 }
             }
+
         }
 
         g.setFont(new Font("Arial", Font.BOLD, 20));
@@ -361,12 +357,19 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 
         for (Block ghost : ghosts) {
             if (Block.collision(ghost, pacman)) {
-                remainingLives -= 1;
-                if (remainingLives == 0) {
-                    gameOver = true;
-                    return;
+                if(!((Ghost) ghost).getScaredStatus())
+                {
+                    remainingLives -= 1;
+                    if (remainingLives == 0) {
+                        gameOver = true;
+                        return;
+                    }
+                    resetPositions();
                 }
-                resetPositions();
+                else {
+                    ghost.reset();
+                    score += 100;
+                }
             }
 
             if(stillInFrame(ghost))
@@ -402,13 +405,37 @@ public class Game extends JPanel implements ActionListener, KeyListener {
             Block food = iterator.next();
             if (Block.collision(pacman, food)) {
                 Food foodItem = (Food) food;
-                if(food instanceof Cherry) {
-                    if(foodsEaten >= 20) {
+                if (food instanceof PowerFood) {
+                    powerFoodEaten = true;
+                    iterator.remove(); // Remove PowerFood from the map
+
+                    // Set all ghosts to scared mode
+                    for (Block ghost : ghosts) {
+                        ((Ghost) ghost).setScaredStatus(true);
+                    }
+                    repaint();
+
+                    // Start timer for 10 seconds
+                    if (powerFoodTimer != null) {
+                        powerFoodTimer.stop();
+                    }
+                    powerFoodTimer = new Timer(10000, e -> {
+                        // Reset all ghosts to normal state
+                        for (Block ghost : ghosts) {
+                            ((Ghost) ghost).setScaredStatus(false);
+                        }
+                        powerFoodTimer.stop();
+                        repaint();
+                    });
+                    powerFoodTimer.setRepeats(false);
+                    powerFoodTimer.start();
+
+                } else if (food instanceof Cherry) {
+                    if (foodsEaten >= 20) {
                         score += foodItem.foodScore;
                         iterator.remove();
                     }
-                }
-                else {
+                } else {
                     score += foodItem.foodScore;
                     foodsEaten++;
                     iterator.remove();
