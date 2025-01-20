@@ -460,11 +460,11 @@ public class Game extends JPanel implements ActionListener, KeyListener {
         if(gameOver) {
             if(e.getKeyCode() == KeyEvent.VK_ENTER) {
                 gameOver = false;
+                mapIndex = random.nextInt(tileMaps.length);
                 loadMap();
                 resetPositions();
                 remainingLives = 3;
                 score = 0;
-                mapIndex = random.nextInt(tileMaps.length);
                 gameLoop.start();
             }
         }
