@@ -33,7 +33,7 @@ public class Ghost extends Block{
 
         updateVelocity(tileSize);
 
-        if (!isScared) { // Only update orientation if not scared
+        if (!isScared) {
             updateOrientation(direction);
         }
 
@@ -74,6 +74,6 @@ public class Ghost extends Block{
     void reset() {
         this.x = this.startX;
         this.y = this.startY;
-        this.isScared = false; // Reset scared state
+        this.isScared = false;
     }
 }

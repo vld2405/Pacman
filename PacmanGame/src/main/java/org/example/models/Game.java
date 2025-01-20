@@ -132,7 +132,6 @@ public class Game extends JPanel implements ActionListener, KeyListener {
             ghost.updateDirection(newDirection, walls, tileSize);
         }
 
-        // how long it takes to start timer, milliseconds gone between frames
         gameLoop = new Timer(50, this); // 20fps (1000/50)
         gameLoop.start();
     }
@@ -142,7 +141,6 @@ public class Game extends JPanel implements ActionListener, KeyListener {
             String data = new String(Files.readAllBytes(Paths.get("./map.json")));
             JSONObject jsonObject = new JSONObject(data);
 
-            // Read variables from JSON
             rowCount = jsonObject.getInt("rowCount");
             columnCount = jsonObject.getInt("columnCount");
             tileSize = jsonObject.getInt("tileSize");
@@ -407,20 +405,17 @@ public class Game extends JPanel implements ActionListener, KeyListener {
                 Food foodItem = (Food) food;
                 if (food instanceof PowerFood) {
                     powerFoodEaten = true;
-                    iterator.remove(); // Remove PowerFood from the map
+                    iterator.remove();
 
-                    // Set all ghosts to scared mode
                     for (Block ghost : ghosts) {
                         ((Ghost) ghost).setScaredStatus(true);
                     }
                     repaint();
 
-                    // Start timer for 10 seconds
                     if (powerFoodTimer != null) {
                         powerFoodTimer.stop();
                     }
                     powerFoodTimer = new Timer(10000, e -> {
-                        // Reset all ghosts to normal state
                         for (Block ghost : ghosts) {
                             ((Ghost) ghost).setScaredStatus(false);
                         }
